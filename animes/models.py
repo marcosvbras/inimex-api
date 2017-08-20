@@ -23,6 +23,7 @@ class Anime(DateAbstractModel):
 	youtube_video_id = models.TextField(blank=True, null=True)
 	show_type = models.CharField(max_length=50, blank=True, null=True)
 	nsfw = models.BooleanField(default=False)
+	
 
 
 

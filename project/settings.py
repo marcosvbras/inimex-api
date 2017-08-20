@@ -41,7 +41,11 @@ INSTALLED_APPS = [
 
     # Project Apps
     'animes',
-    'genres'
+    'categories',
+    'characters',
+    'episodes',
+    'genres',
+    'reviews'
 ]
 
 MIDDLEWARE = [
