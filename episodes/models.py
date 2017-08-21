@@ -1,5 +1,6 @@
 from django.db import models
 from utils.models import DateAbstractModel
+from animes.models import Anime
 
 class Episode(DateAbstractModel):
 
@@ -13,3 +14,4 @@ class Episode(DateAbstractModel):
 	air_date = models.CharField(max_length=30)
 	thumbnail_url = models.TextField(blank=True, null=True)
 	length = models.IntegerField()
+	anime = models.ForeignKey(Anime)

@@ -1,5 +1,6 @@
 from django.db import models
 from utils.models import DateAbstractModel
+from animes.models import Anime
 
 class Review(DateAbstractModel):
 
@@ -10,4 +11,5 @@ class Review(DateAbstractModel):
 	rating = models.IntegerField()
 	source = models.CharField(max_length=255, blank=True, null=True)
 	spoiler = models.BooleanField(default=True)
+	anime = models.ForeignKey(Anime)
 	

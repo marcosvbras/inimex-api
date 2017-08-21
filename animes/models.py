@@ -1,5 +1,7 @@
 from django.db import models
 from utils.models import DateAbstractModel
+from categories.models import Categorie
+from genres.models import Genre
 
 class Anime(DateAbstractModel):
 	
@@ -9,7 +11,6 @@ class Anime(DateAbstractModel):
 	english_title = models.CharField(max_length=255, blank=True, null=True)
 	original_title = models.CharField(max_length=255)
 	canonical_title = models.CharField(max_length=255, blank=True, null=True)
-	average_rating = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
 	start_date = models.CharField(max_length=255, blank=True, null=True)
 	end_date = models.CharField(max_length=255, blank=True, null=True)
 	age_rating = models.CharField(max_length=50, blank=True, null=True)
@@ -23,6 +24,10 @@ class Anime(DateAbstractModel):
 	youtube_video_id = models.TextField(blank=True, null=True)
 	show_type = models.CharField(max_length=50, blank=True, null=True)
 	nsfw = models.BooleanField(default=False)
+	# M2M Fields
+	categories = models.ManyToManyField(Categorie)
+	genres = models.ManyToManyField(Genre)
+
 	
 
 
