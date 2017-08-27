@@ -1,86 +1,102 @@
+from __future__ import absolute_import
+from celery import shared_task
+from .models import Anime
+from genres.models import Genre
 import requests
 import json
 
 max_id = 13589
 range1 = lambda start, end: range(start, end+1)
 
+@shared_task
 def get_animes():
 	for id in range1(200, 200):
 		url = "https://kitsu.io/api/edge/anime/{0}".format(id)
-		response = requests.get(url.format(max_id))
+		response = requests.get(url)
 		anime_data = response.json()['data']
 
 		if anime_data:
-			print("Id: {}".format(anime_data['id']))
+			if not Anime.objects.filter(original_id=anime_data['id']).exists():
+				anime = Anime()
+				anime.original_id = anime_data['id']
 
-			if 'attributes' in anime_data:
-				print("Slug: {}".format(anime_data['attributes']['slug']))
-				print("Synopsis: {}".format(anime_data['attributes']['synopsis']))
+				if 'attributes' in anime_data:
+					anime.slug = anime_data['attributes']['slug']
+					anime.synopsis = anime_data['attributes']['synopsis']
 
-				if 'titles' in anime_data['attributes']:
-					print("Title: {}".format(anime_data['attributes']['titles']['en']))
-					print("Title (JP): {}".format(anime_data['attributes']['titles']['en_jp']))
+					if 'titles' in anime_data['attributes']:
+						anime.english_title = anime_data['attributes']['titles']['en']
+						anime.original_title = anime_data['attributes']['titles']['en_jp']
 
-				print("Canonical Title: {}".format(anime_data['attributes']['canonicalTitle']))
-				print("StartDate: {}".format(anime_data['attributes']['startDate']))
-				print("EndDate: {}".format(anime_data['attributes']['endDate']))
-				print("Age Rating: {}".format(anime_data['attributes']['ageRating']))
-				print("Age Rating Guide: {}".format(anime_data['attributes']['ageRatingGuide']))
-				print("Subtype: {}".format(anime_data['attributes']['subtype']))
-				print("Status: {}".format(anime_data['attributes']['status']))
+					anime.canonical_title = anime_data['attributes']['canonicalTitle']
+					anime.start_date = anime_data['attributes']['startDate']
+					anime.end_date = anime_data['attributes']['endDate']
+					anime.age_rating = anime_data['attributes']['ageRating']
+					anime.age_rating_guide = anime_data['attributes']['ageRatingGuide']
+					anime.subtype = anime_data['attributes']['subtype']
+					anime.status = anime_data['attributes']['status']
 
-				if 'posterImage' in anime_data['attributes']:
-					print("Poster Image: {}".format(anime_data['attributes']['posterImage']['medium']))
-				if 'coverImage' in anime_data['attributes']:
-					print("Cover Image: {}".format(anime_data['attributes']['coverImage']['large']))
+					if 'posterImage' in anime_data['attributes']:
+						anime.poster_image_link = anime_data['attributes']['posterImage']['medium']
+					if 'coverImage' in anime_data['attributes']:
+						anime.cover_image_link = anime_data['attributes']['coverImage']['large']
 
-				print("Episode Count: {}".format(anime_data['attributes']['episodeCount']))
-				print("Episode Length: {}".format(anime_data['attributes']['episodeLength']))
-				print("YoutubeVideoId: {}".format(anime_data['attributes']['youtubeVideoId']))
-				print("Show Type: {}".format(anime_data['attributes']['showType']))
-				print("NSFW: {}".format(anime_data['attributes']['nsfw']))
+					anime.episode_count = anime_data['attributes']['episodeCount']
+					anime.episode_length = anime_data['attributes']['episodeLength']
+					anime.youtube_video_id = anime_data['attributes']['youtubeVideoId']
+					anime.show_type = anime_data['attributes']['showType']
+					anime.nsfw = anime_data['attributes']['nsfw']
+					anime.save()
+					print("Getted anime: {}".format(anime.english_title))
 
-			if 'genres' in anime_data.get('relationships', {}):
-				if 'related' in anime_data['relationships']['genres'].get('links', {}) and \
-					anime_data['relationships']['genres']['links']['related']:
-					get_genres(anime_data['relationships']['genres']['links']['related'])
+				if 'genres' in anime_data.get('relationships', {}):
+					if 'related' in anime_data['relationships']['genres'].get('links', {}) and \
+						anime_data['relationships']['genres']['links']['related']:
+						get_genres(anime_data['relationships']['genres']['links']['related'], anime)
 
-			if 'categories' in anime_data.get('relationships', {}):
-				if 'related' in anime_data['relationships']['categories'].get('links', {}) and \
-					anime_data['relationships']['categories']['links']['related']:
-					get_categories(anime_data['relationships']['categories']['links']['related'])
+			# if 'categories' in anime_data.get('relationships', {}):
+			# 	if 'related' in anime_data['relationships']['categories'].get('links', {}) and \
+			# 		anime_data['relationships']['categories']['links']['related']:
+			# 		get_categories(anime_data['relationships']['categories']['links']['related'])
 
-			if 'reviews' in anime_data.get('relationships', {}):
-				if 'related' in anime_data['relationships']['reviews'].get('links', {}) and \
-					anime_data['relationships']['reviews']['links']['related']:
-					get_reviews(anime_data['relationships']['reviews']['links']['related'])
+			# if 'reviews' in anime_data.get('relationships', {}):
+			# 	if 'related' in anime_data['relationships']['reviews'].get('links', {}) and \
+			# 		anime_data['relationships']['reviews']['links']['related']:
+			# 		get_reviews(anime_data['relationships']['reviews']['links']['related'])
 
-			if 'episodes' in anime_data.get('relationships', {}):
-				if 'related' in anime_data['relationships']['episodes'].get('links', {}) and \
-					anime_data['relationships']['episodes']['links']['related']:
-					get_episodes(anime_data['relationships']['episodes']['links']['related'])
+			# if 'episodes' in anime_data.get('relationships', {}):
+			# 	if 'related' in anime_data['relationships']['episodes'].get('links', {}) and \
+			# 		anime_data['relationships']['episodes']['links']['related']:
+			# 		get_episodes(anime_data['relationships']['episodes']['links']['related'])
 
-			if 'animeCharacters' in anime_data.get('relationships', {}):
-				if 'related' in anime_data['relationships']['animeCharacters'].get('links', {}) and \
-					anime_data['relationships']['animeCharacters']['links']['related']:
-					get_anim_characters(anime_data['relationships']['animeCharacters']['links']['related'])
+			# if 'animeCharacters' in anime_data.get('relationships', {}):
+			# 	if 'related' in anime_data['relationships']['animeCharacters'].get('links', {}) and \
+			# 		anime_data['relationships']['animeCharacters']['links']['related']:
+			# 		get_anim_characters(anime_data['relationships']['animeCharacters']['links']['related'])
 
 
 
-def get_genres(url):
+def get_genres(url, anime):
 	response_genres = requests.get(url)
 	genre_values = response_genres.json()
-
+	
 	if 'data' in genre_values:
 		for data in genre_values['data']:
-			print("Genre Id: {}".format(data['id']))	
-			if 'attributes' in data:
-				print("Genre Name: {}".format(data['attributes']['name']))
-				print("Genre Slug: {}".format(data['attributes']['slug']))
-				print("Genre Description: {}".format(data['attributes']['description']))
+			if not Genre.objects.filter(original_id=data['id']).exists():
+				genre = Genre()
+				genre.original_id = data['id']
+
+				genre.original_id = data['id']
+				if 'attributes' in data:
+					genre.name = data['attributes']['name']
+					genre.slug = data['attributes']['slug']
+					genre.description = data['attributes']['description']
+					genre.save()
+					anime.genres_set.get_or_create(genre=genre)
+					print("Getted genre: {}".format(data['attributes']['name']))
 
 	if 'next' in genre_values['links']:
-		get_genres(genre_values['links']['next'])
+		get_genres(genre_values['links']['next'], anime)
 
 
 def get_categories(url):
