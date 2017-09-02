@@ -7,3 +7,6 @@ class Genre(DateAbstractModel):
 	name = models.CharField(max_length=255)
 	slug = models.CharField(max_length=255)
 	description = models.CharField(max_length=255, blank=True, null=True)
+
+	def __str__(self):
+		return self.name

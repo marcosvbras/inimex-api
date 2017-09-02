@@ -9,3 +9,6 @@ class Categorie(DateAbstractModel):
 	description = models.TextField(blank=True, null=True)
 	nsfw = models.BooleanField(default=False)
 
+	def __str__(self):
+		return self.title
+

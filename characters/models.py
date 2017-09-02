@@ -10,5 +10,8 @@ class Character(DateAbstractModel):
 	original_id = models.IntegerField()
 	description = models.TextField(blank=True, null = True)
 	image_url = models.TextField(blank=True, null = True)
-	anime = models.ForeignKey(Anime)
+	anime = models.ForeignKey(Anime, on_delete=models.CASCADE)
+
+	def __str__(self):
+		return self.name
 

@@ -11,5 +11,8 @@ class Review(DateAbstractModel):
 	rating = models.IntegerField()
 	source = models.CharField(max_length=255, blank=True, null=True)
 	spoiler = models.BooleanField(default=True)
-	anime = models.ForeignKey(Anime)
+	anime = models.ForeignKey(Anime, on_delete=models.CASCADE)
+
+	def __str__(self):
+		return self.content[:20]
 	

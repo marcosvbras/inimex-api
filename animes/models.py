@@ -28,6 +28,9 @@ class Anime(DateAbstractModel):
 	categories = models.ManyToManyField(Categorie)
 	genres = models.ManyToManyField(Genre)
 
+	def __str__(self):
+		return self.english_title or self.original_title
+
 	
 
 

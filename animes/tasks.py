@@ -2,6 +2,10 @@ from __future__ import absolute_import
 from celery import shared_task
 from .models import Anime
 from genres.models import Genre
+from categories.models import Categorie
+from reviews.models import Review
+from episodes.models import Episode
+from characters.models import Character
 import requests
 import json
 
@@ -10,7 +14,7 @@ range1 = lambda start, end: range(start, end+1)
 
 @shared_task
 def get_animes():
-	for id in range1(200, 200):
+	for id in range1(200, 205):
 		url = "https://kitsu.io/api/edge/anime/{0}".format(id)
 		response = requests.get(url)
 		anime_data = response.json()['data']
@@ -36,9 +40,9 @@ def get_animes():
 					anime.subtype = anime_data['attributes']['subtype']
 					anime.status = anime_data['attributes']['status']
 
-					if 'posterImage' in anime_data['attributes']:
+					if anime_data['attributes']['posterImage'] and 'medium' in anime_data['attributes'].get('posterImage', {}):
 						anime.poster_image_link = anime_data['attributes']['posterImage']['medium']
-					if 'coverImage' in anime_data['attributes']:
+					if anime_data['attributes']['coverImage'] and 'large' in anime_data['attributes'].get('coverImage', {}):
 						anime.cover_image_link = anime_data['attributes']['coverImage']['large']
 
 					anime.episode_count = anime_data['attributes']['episodeCount']
@@ -47,32 +51,32 @@ def get_animes():
 					anime.show_type = anime_data['attributes']['showType']
 					anime.nsfw = anime_data['attributes']['nsfw']
 					anime.save()
-					print("Getted anime: {}".format(anime.english_title))
+					print("Getted anime: {}".format(str(anime)))
 
 				if 'genres' in anime_data.get('relationships', {}):
 					if 'related' in anime_data['relationships']['genres'].get('links', {}) and \
 						anime_data['relationships']['genres']['links']['related']:
 						get_genres(anime_data['relationships']['genres']['links']['related'], anime)
 
-			# if 'categories' in anime_data.get('relationships', {}):
-			# 	if 'related' in anime_data['relationships']['categories'].get('links', {}) and \
-			# 		anime_data['relationships']['categories']['links']['related']:
-			# 		get_categories(anime_data['relationships']['categories']['links']['related'])
+				if 'categories' in anime_data.get('relationships', {}):
+					if 'related' in anime_data['relationships']['categories'].get('links', {}) and \
+						anime_data['relationships']['categories']['links']['related']:
+						get_categories(anime_data['relationships']['categories']['links']['related'], anime)
 
-			# if 'reviews' in anime_data.get('relationships', {}):
-			# 	if 'related' in anime_data['relationships']['reviews'].get('links', {}) and \
-			# 		anime_data['relationships']['reviews']['links']['related']:
-			# 		get_reviews(anime_data['relationships']['reviews']['links']['related'])
+				if 'reviews' in anime_data.get('relationships', {}):
+					if 'related' in anime_data['relationships']['reviews'].get('links', {}) and \
+						anime_data['relationships']['reviews']['links']['related']:
+						get_reviews(anime_data['relationships']['reviews']['links']['related'], anime)
 
-			# if 'episodes' in anime_data.get('relationships', {}):
-			# 	if 'related' in anime_data['relationships']['episodes'].get('links', {}) and \
-			# 		anime_data['relationships']['episodes']['links']['related']:
-			# 		get_episodes(anime_data['relationships']['episodes']['links']['related'])
+				if 'episodes' in anime_data.get('relationships', {}):
+					if 'related' in anime_data['relationships']['episodes'].get('links', {}) and \
+						anime_data['relationships']['episodes']['links']['related']:
+						get_episodes(anime_data['relationships']['episodes']['links']['related'], anime)
 
-			# if 'animeCharacters' in anime_data.get('relationships', {}):
-			# 	if 'related' in anime_data['relationships']['animeCharacters'].get('links', {}) and \
-			# 		anime_data['relationships']['animeCharacters']['links']['related']:
-			# 		get_anim_characters(anime_data['relationships']['animeCharacters']['links']['related'])
+				if 'animeCharacters' in anime_data.get('relationships', {}):
+					if 'related' in anime_data['relationships']['animeCharacters'].get('links', {}) and \
+						anime_data['relationships']['animeCharacters']['links']['related']:
+						get_anim_characters(anime_data['relationships']['animeCharacters']['links']['related'], anime)
 
 
 
@@ -82,82 +86,116 @@ def get_genres(url, anime):
 	
 	if 'data' in genre_values:
 		for data in genre_values['data']:
-			if not Genre.objects.filter(original_id=data['id']).exists():
+			genre = Genre.objects.filter(original_id=data['id']).first()
+
+			if not genre:
 				genre = Genre()
 				genre.original_id = data['id']
-
-				genre.original_id = data['id']
+				
 				if 'attributes' in data:
 					genre.name = data['attributes']['name']
 					genre.slug = data['attributes']['slug']
 					genre.description = data['attributes']['description']
 					genre.save()
-					anime.genres_set.get_or_create(genre=genre)
-					print("Getted genre: {}".format(data['attributes']['name']))
+					print("Getted genre: {}".format(str(genre)))
+			
+			if not anime.genres.filter(id=genre.id).exists():
+				anime.genres.add(genre)
+				print("Added genre {} to anime {}".format(str(genre), str(anime)))
 
 	if 'next' in genre_values['links']:
 		get_genres(genre_values['links']['next'], anime)
 
 
-def get_categories(url):
+def get_categories(url, anime):
 	response_categories = requests.get(url)
 	categorie_values = response_categories.json()
 
 	if 'data' in categorie_values:
 		for data in categorie_values['data']:
-			print("Categorie Id: {}".format(data['id']))	
-			if 'attributes' in data:
-				print("Categorie Title: {}".format(data['attributes']['title']))
-				print("Categorie Slug: {}".format(data['attributes']['slug']))
-				print("Categorie Description: {}".format(data['attributes']['description']))
-				print("Categorie NSFW: {}".format(data['attributes']['nsfw']))
+			categorie = Categorie.objects.filter(original_id=data['id']).first()
+
+			if not categorie:
+				categorie = Categorie()
+				categorie.original_id = data['id']
+					
+				if 'attributes' in data:
+					categorie.title = data['attributes']['title']
+					categorie.slug = data['attributes']['slug']
+					categorie.description = data['attributes']['description']
+					categorie.nsfw = data['attributes']['nsfw']
+					categorie.save()
+					print("Getted categorie: {}".format(str(categorie)))
+
+			if not anime.categories.filter(id=categorie.id).exists():
+				anime.categories.add(categorie)
+				print("Added categorie {} to anime {}".format(str(categorie), str(anime)))
 
 	if 'next' in categorie_values['links']:
-		get_categories(categorie_values['links']['next'])
+		get_categories(categorie_values['links']['next'], anime)
 
 
-def get_reviews(url):
+def get_reviews(url, anime):
 	response_reviews = requests.get(url)
 	review_values = response_reviews.json()
 
 	if 'data' in review_values:
 		for data in review_values['data']:
-			print("Review Id: {}".format(data['id']))	
-			if 'attributes' in data:
-				print("Review Content: {}".format(data['attributes']['content']))
-				print("Review Content Formatted: {}".format(data['attributes']['contentFormatted']))
-				print("Review Likes Count: {}".format(data['attributes']['likesCount']))
-				print("Review rating: {}".format(data['attributes']['rating']))
-				print("Review source: {}".format(data['attributes']['source']))
-				print("Review spoiler: {}".format(data['attributes']['spoiler']))
+			review = Review.objects.filter(original_id=data['id'])
+
+			if not review:
+				review = Review()
+				review.original_id = data['id']
+
+				if 'attributes' in data:
+					review.content = data['attributes']['content']
+					review.content_formatted = data['attributes']['contentFormatted']
+					review.likes_count = data['attributes']['likesCount']
+					review.rating = data['attributes']['rating']
+					review.source = data['attributes']['source']
+					review.anime = anime
+					review.spoiler = data['attributes']['spoiler']
+					review.save()
+					print("Added review '{}' to anime {}".format(str(review), str(anime)))
 
 	if 'next' in review_values['links']:
-		get_reviews(review_values['links']['next'])
+		get_reviews(review_values['links']['next'], anime)
 
 
-def get_episodes(url):
+def get_episodes(url, anime):
 	response_episodes = requests.get(url)
 	episode_values = response_episodes.json()
 
 	if 'data' in episode_values:
 		for data in episode_values['data']:
-			print("Episode Id: {}".format(data['id']))	
-			if 'attributes' in data:
-				if 'en_jp' in data['attributes']['titles']:
-					print("Episode Original Title: {}".format(data['attributes']['titles']['en_jp']))
-				if 'en' in data['attributes']['titles']:
-					print("Episode English Title: {}".format(data['attributes']['titles']['en']))
+			episode = Episode.objects.filter(original_id=data['id']).first()
 
-				print("Episode Canonical Title: {}".format(data['attributes']['canonicalTitle']))
-				print("Episode Season Number: {}".format(data['attributes']['seasonNumber']))
-				print("Episode number: {}".format(data['attributes']['number']))
-				print("Episode synopsis: {}".format(data['attributes']['synopsis']))
-				print("Episode Length: {}".format(data['attributes']['length']))
+			if not episode:
+				episode = Episode()
+				episode.original_id = data['id']
+
+				if 'attributes' in data:
+					if 'en_jp' in data['attributes']['titles']:
+						episode.original_title = data['attributes']['titles']['en_jp']
+					if 'en' in data['attributes']['titles']:
+						episode.english_title = data['attributes']['titles']['en']
+
+					episode.anime = anime
+					episode.canonical_title = data['attributes']['canonicalTitle']
+					episode.season_number = data['attributes']['seasonNumber']
+					episode.number = data['attributes']['number']
+					episode.synopsis = data['attributes']['synopsis']
+
+					if data['attributes']['length']:
+						episode.length = data['attributes']['length']
+
+					episode.save()
+					print("Added episode '{}' to anime {}".format(str(episode), str(anime)))
 
 	if 'next' in episode_values['links']:
-		get_episodes(episode_values['links']['next'])
+		get_episodes(episode_values['links']['next'], anime)
 
-def get_anim_characters(url):
+def get_anim_characters(url, anime):
 	response_anim_charac = requests.get(url)
 	anim_charac_values = response_anim_charac.json()
 	
@@ -166,28 +204,33 @@ def get_anim_characters(url):
 			if 'character' in anim_charac_data.get('relationships', {}):
 				if 'related' in anim_charac_data['relationships']['character'].get('links', {}) and \
 					anim_charac_data['relationships']['character']['links']['related']:
-					get_characters(anim_charac_data['relationships']['character']['links']['related'])
+					get_characters(anim_charac_data['relationships']['character']['links']['related'], anime)
 
 	if 'next' in anim_charac_values['links']:
-		get_anim_characters(anim_charac_values['links']['next'])
+		get_anim_characters(anim_charac_values['links']['next'], anime)
 
 
-def get_characters(url):
+def get_characters(url, anime):
 	response_characters = requests.get(url)
 	result = response_characters.json()
 	
 	if 'data' in result:
 		data = result['data']
-		if 'attributes' in data:
-			print("Character Slug: {}".format(data['attributes']['slug']))
-			print("Character Name: {}".format(data['attributes']['name']))
-			print("Character malId: {}".format(data['attributes']['malId']))
-			print("Character description: {}".format(data['attributes']['description']))
+		character = Character.objects.filter(original_id=data['id'])
 
-			if data['attributes']['image'] and'original' in data['attributes']['image']:
-				print("Character Image Url: {}".format(data['attributes']['image']['original']))
+		if not character:
+			character = Character()
+			character.original_id = data['id']
 
+			if 'attributes' in data:
+				character.anime = anime
+				character.slug = data['attributes']['slug']
+				character.name = data['attributes']['name']
+				character.mal_id = data['attributes']['malId']
+				character.description = data['attributes']['description']
 
+				if data['attributes']['image'] and'original' in data['attributes']['image']:
+					character.image_url = data['attributes']['image']['original']
 
-
-
+				character.save()
+				print("Added character '{}' to anime {}".format(str(character), str(anime)))
