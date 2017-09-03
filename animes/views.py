@@ -1,7 +1,4 @@
-from django.shortcuts import render, get_object_or_404
-from rest_framework.views import APIView
-from django.http import HttpResponse
-from .tasks import get_animes
+from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
 from .serializers import AnimeSerializer, AnimePagination
 from .models import Anime
@@ -25,8 +22,3 @@ class AnimeUpdateRetriveView(AnimeMixim, RetrieveUpdateAPIView):
 		anime_pk = self.kwargs['anime_pk']
 		return get_object_or_404(Anime, pk=anime_pk)
 
-
-class GetAnimesView(APIView):
-	def post(self, *args, **kwargs):
-		get_animes.delay()
-		return HttpResponse("Getting animes")

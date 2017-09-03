@@ -1,14 +1,14 @@
 from django.conf import settings
 from rest_framework.serializers import ModelSerializer
 from rest_framework.pagination import PageNumberPagination
-from .models import Anime
+from .models import Categorie
 
-class AnimeSerializer(ModelSerializer):
+class CategorieSerializer(ModelSerializer):
 
 	class Meta:
-		model = Anime
+		model = Categorie
 		fields = '__all__'
 
 
-class AnimePagination(PageNumberPagination):
+class CategoriePagination(PageNumberPagination):
 	page_size = settings.DEFAULT_PAGE_SIZE
