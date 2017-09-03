@@ -25,6 +25,8 @@ SECRET_KEY = '6o-2zzpx$7eaec$o1y4pk(7i1rzvrhljl@00(khlhfi3)k7c@a'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+ANIME_PAGE_SIZE = 12
+
 ALLOWED_HOSTS = []
 
 # Celery Config

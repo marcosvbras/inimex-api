@@ -14,7 +14,7 @@ range1 = lambda start, end: range(start, end+1)
 
 @shared_task
 def get_animes():
-	for id in range1(200, 205):
+	for id in range1(1, 200):
 		url = "https://kitsu.io/api/edge/anime/{0}".format(id)
 		response = requests.get(url)
 		anime_data = response.json()['data']
@@ -29,8 +29,10 @@ def get_animes():
 					anime.synopsis = anime_data['attributes']['synopsis']
 
 					if 'titles' in anime_data['attributes']:
-						anime.english_title = anime_data['attributes']['titles']['en']
-						anime.original_title = anime_data['attributes']['titles']['en_jp']
+						if 'en' in anime_data['attributes']['titles']:
+							anime.english_title = anime_data['attributes']['titles']['en']
+						if 'en_jp' in anime_data['attributes']['titles']:
+							anime.original_title = anime_data['attributes']['titles']['en_jp']
 
 					anime.canonical_title = anime_data['attributes']['canonicalTitle']
 					anime.start_date = anime_data['attributes']['startDate']
@@ -101,7 +103,7 @@ def get_genres(url, anime):
 			
 			if not anime.genres.filter(id=genre.id).exists():
 				anime.genres.add(genre)
-				print("Added genre {} to anime {}".format(str(genre), str(anime)))
+				print("Added genre '{}' to anime '{}'".format(str(genre), str(anime)))
 
 	if 'next' in genre_values['links']:
 		get_genres(genre_values['links']['next'], anime)
@@ -129,7 +131,7 @@ def get_categories(url, anime):
 
 			if not anime.categories.filter(id=categorie.id).exists():
 				anime.categories.add(categorie)
-				print("Added categorie {} to anime {}".format(str(categorie), str(anime)))
+				print("Added categorie {} to anime '{}'".format(str(categorie), str(anime)))
 
 	if 'next' in categorie_values['links']:
 		get_categories(categorie_values['links']['next'], anime)
@@ -156,7 +158,7 @@ def get_reviews(url, anime):
 					review.anime = anime
 					review.spoiler = data['attributes']['spoiler']
 					review.save()
-					print("Added review '{}' to anime {}".format(str(review), str(anime)))
+					print("Added review '{}' to anime '{}'".format(str(review), str(anime)))
 
 	if 'next' in review_values['links']:
 		get_reviews(review_values['links']['next'], anime)
@@ -233,4 +235,4 @@ def get_characters(url, anime):
 					character.image_url = data['attributes']['image']['original']
 
 				character.save()
-				print("Added character '{}' to anime {}".format(str(character), str(anime)))
+				print("Added character '{}' to anime '{}'".format(str(character), str(anime)))
