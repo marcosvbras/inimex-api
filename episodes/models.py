@@ -4,6 +4,7 @@ from animes.models import Anime
 
 class Episode(DateAbstractModel):
 
+	anime = models.ForeignKey(Anime, on_delete=models.CASCADE)
 	original_id = models.IntegerField()
 	english_title = models.CharField(max_length=255, blank=True, null=True)
 	original_title = models.CharField(max_length=255, blank=True, null=True)
@@ -14,7 +15,6 @@ class Episode(DateAbstractModel):
 	air_date = models.CharField(max_length=30, blank=True, null=True)
 	thumbnail_url = models.TextField(blank=True, null=True)
 	length = models.IntegerField(blank=True, null=True)
-	anime = models.ForeignKey(Anime, on_delete=models.CASCADE)
 
 	def __str__(self):
 		return self.english_title or self.original_title or 'Unknown'

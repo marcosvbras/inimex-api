@@ -6,10 +6,10 @@ from genres.models import Genre
 class Anime(DateAbstractModel):
 	
 	original_id = models.IntegerField()
-	slug = models.CharField(max_length=255)
-	synopsis = models.TextField(blank=True, null=True)
 	english_title = models.CharField(max_length=255, blank=True, null=True)
 	original_title = models.CharField(max_length=255, blank=True, null=True)
+	slug = models.CharField(max_length=255)
+	synopsis = models.TextField(blank=True, null=True)
 	canonical_title = models.CharField(max_length=255, blank=True, null=True)
 	start_date = models.CharField(max_length=255, blank=True, null=True)
 	end_date = models.CharField(max_length=255, blank=True, null=True)

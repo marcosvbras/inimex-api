@@ -4,6 +4,7 @@ from animes.models import Anime
 
 class Review(DateAbstractModel):
 
+	anime = models.ForeignKey(Anime, on_delete=models.CASCADE)
 	original_id = models.IntegerField()
 	content = models.TextField()
 	content_formatted = models.TextField(blank=True, null=True)
@@ -11,7 +12,6 @@ class Review(DateAbstractModel):
 	rating = models.IntegerField()
 	source = models.CharField(max_length=255, blank=True, null=True)
 	spoiler = models.BooleanField(default=True)
-	anime = models.ForeignKey(Anime, on_delete=models.CASCADE)
 
 	def __str__(self):
 		return self.content[:20]

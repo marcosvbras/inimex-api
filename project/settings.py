@@ -52,7 +52,8 @@ INSTALLED_APPS = [
     'characters',
     'episodes',
     'genres',
-    'reviews'
+    'reviews',
+    'searches'
 ]
 
 MIDDLEWARE = [
