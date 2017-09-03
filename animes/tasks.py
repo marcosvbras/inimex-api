@@ -13,8 +13,15 @@ max_id = 13589
 range1 = lambda start, end: range(start, end+1)
 
 @shared_task
-def get_animes():
-	for id in range1(1, 200):
+def get_animes(start_id=None, end_id=None):
+	if start_id and end_id:
+		start = start_id
+		end = end_id
+	else:
+		start = 1
+		end = 1
+	
+	for id in range1(start, end):
 		url = "https://kitsu.io/api/edge/anime/{0}".format(id)
 		response = requests.get(url)
 		anime_data = response.json()['data']
