@@ -2,7 +2,7 @@ Inimex API
 =======================
 
 A simple Django REST API that provide anime informations.
-The anime data is crawled from [Kitsu API](https://kitsu.io/).
+The anime data is consumed from [Kitsu API](https://kitsu.io/).
 
 Requirements
 -------------------------
