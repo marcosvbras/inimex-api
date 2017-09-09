@@ -9,5 +9,6 @@ urlpatterns = [
 	url(r'^v1/', include('genres.urls', namespace='genres')),
 	url(r'^v1/', include('reviews.urls', namespace='reviews')),
 	url(r'^v1/', include('searches.urls', namespace='searches')),
+	url(r'^v1/', include('users.urls', namespace='users')),
     url(r'^admin/', admin.site.urls),
 ]
