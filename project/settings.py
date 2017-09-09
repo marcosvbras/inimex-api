@@ -51,6 +51,7 @@ INSTALLED_APPS = [
 
     # Project Apps
     'animes',
+    'blacklist',
     'categories',
     'characters',
     'episodes',
