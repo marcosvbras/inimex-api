@@ -17,10 +17,10 @@ class ReviewListCreateView(ReviewMixim, ListCreateAPIView):
 	def get_queryset(self):
 		anime_pk = self.kwargs['anime_pk']
 		anime = get_object_or_404(Anime, pk=anime_pk)
-		return get_object_or_404(Review, anime=anime)
+		return Review.objects.filter(anime=anime)
 
 
-class ReviewRetrieveUpdate(ReviewMixim, RetrieveUpdateAPIView):
+class ReviewRetrieveUpdateView(ReviewMixim, RetrieveUpdateAPIView):
 
 	def get_object(self):
 		anime_pk = self.kwargs['anime_pk']
