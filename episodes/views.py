@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
+from rest_framework.permissions import IsAuthenticated
 from .serializers import EpisodeSerializer, EpisodePagination
 from animes.models import Anime
 from .models import Episode
@@ -7,6 +8,7 @@ from .models import Episode
 class EpisodeMixim:
 	serializer_class = EpisodeSerializer
 	pagination_class = EpisodePagination
+	permission_classes = (IsAuthenticated,)
 
 	def get_queryset(self):
 		Episode.objects.all()

@@ -1,28 +1,22 @@
-from django.contrib.auth import authenticate, login
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+
+from django.contrib.auth import authenticate, login
 from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
 
 class UserLoginView(APIView):
 
-	authentication_classes = (SessionAuthentication, BasicAuthentication,)
-	permission_classes = (IsAuthenticated,)
+	authentication_classes = (TokenAuthentication,)
 
-	def get(self, request, format=None):
-		content = {
-			'user': request.user,
-			'auth': request.auth,
-		}
-		return Response(content)
+	def post(self, request):
+		username = request.data.get('username')
+		password = request.data.get('password')
+		user = authenticate(request, username=username, password=password)
 
-	# def post(self, request, *args, **kwargs):
-	# 	username = request.POST['username']
-	# 	password = request.POST['password']
-	# 	user = authenticate(request, username=username, password=password)
+		if not user:
+			return Response({'error': 'Login failed. Username or password invalid.'})
 
-	# 	if user:
-	# 		HttpResponse(login(request, user))
-	# 	else:
-	# 		HttpResponse("{ error: 'Username or password incorrect}")
-
+		token, created = Token.objects.get_or_create(user=user)
+		return Response({'token': token.key})

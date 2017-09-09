@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
+from rest_framework.permissions import IsAuthenticated
 from .serializers import ReviewSerializer, ReviewPagination
 from .models import Review
 from animes.models import Anime
@@ -7,6 +8,7 @@ from animes.models import Anime
 class ReviewMixim:
 	serializer_class = ReviewSerializer
 	pagination_class = ReviewPagination
+	permission_classes = (IsAuthenticated,)
 
 	def get_queryset(self):
 		Review.objects.all()

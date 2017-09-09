@@ -1,4 +1,5 @@
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
+from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from .models import Categorie
 from .serializers import CategorieSerializer, CategoriePagination
@@ -6,6 +7,7 @@ from .serializers import CategorieSerializer, CategoriePagination
 class CategorieMixim:
 	serializer_class = CategorieSerializer
 	pagination_class = CategoriePagination
+	permission_classes = (IsAuthenticated,)
 
 	def get_queryset(self):
 		return Categorie.objects.all()

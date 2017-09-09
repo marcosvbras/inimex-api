@@ -46,6 +46,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
 
+    # Rest Authentication with Token
+    'rest_framework.authtoken',
+
     # Project Apps
     'animes',
     'categories',
@@ -58,10 +61,14 @@ INSTALLED_APPS = [
 
 
 REST_FRAMEWORK = {
-    # For Django Rest authentication
+    # Django uses this classes to run a authentication
+    # As soon as a class successfully authenticates the user, 
+    # the return values from the call is set to request.user and request.auth. 
+    # If none of the classes manage to authenticate the user, 
+    # then the user is set to django.contrib.auth.models.AnonymousUser
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     )
 }
 

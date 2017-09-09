@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
+from rest_framework.permissions import IsAuthenticated
 from .serializers import CharacterSerializer, CharacterPagination
 from .models import Character
 from animes.models import Anime
@@ -7,6 +8,7 @@ from animes.models import Anime
 class CharacterMixim:
 	serializer_class = CharacterSerializer
 	pagination_class = CharacterPagination
+	permission_classes = (IsAuthenticated,)
 
 	def get_queryset(self):
 		return Character.objects.all()
