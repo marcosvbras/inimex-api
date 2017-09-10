@@ -1,9 +1,6 @@
 # Inimex API
-=======================
 
-Inimex API is a simple Django RESTful API that provides anime informations and allow that users to make your own anime lists (like a [MyAnimeList](https://myanimelist.net/)). 
-
-The anime data is consumed from [Kitsu API](https://kitsu.io/).
+**Inimex API** is a simple Django RESTful API that provides anime informations and allow that users to make your own anime lists (like the [MyAnimeList](https://myanimelist.net/)). The anime data is consumed from [Kitsu API](https://kitsu.io/).
 
 Using this API you can do:
 1. Perform basic CRUD related to animes.
@@ -12,13 +9,11 @@ Using this API you can do:
 This project is used for learn more about the magic-huge web world and improve my Jedi Master Programming Skills in Python. Let's build the best Anime API;)
 
 ## Requirements
--------------------------
 - Python 3.5;
 - RabbitMQ 3.6.11;
 
 ## Installation
--------------------------
-Install all libraries in the 'requirements.pip' file:
+Install all libraries in the `requirements.pip` file:
 
 ```
 pip install -r requirements.pip
@@ -37,7 +32,6 @@ Change `settings.BROKER_URL` based in your RabbitMQ configurations.
 Ensure that RabbitMQ is running.
 
 ## Running the project
--------------------------
 Run the application using the Django built in server:
 
 ```
@@ -50,14 +44,13 @@ Run Django Celery:
 celery --app=project worker --loglevel=INFO
 ```
 
-(Optional) Run Django Celery Flower to tasks monitoring
+(Optional) Run Django Celery Flower to tasks monitoring:
 
 ```
 celery --app=project flower
 ```
 
 ## Stack
--------------------------
 - Backend: Python/Django REST Framework
 - Broker: RabbitMQ
 - Database: SQLite
