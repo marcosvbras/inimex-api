@@ -2,15 +2,15 @@
 
 **Inimex API** is a simple Django RESTful API that provides anime informations and allow that users to make your own anime lists (like the [MyAnimeList](https://myanimelist.net/)). The anime data is consumed from [Kitsu API](https://kitsu.io/).
 
-Using this API you can do:
+Using this API you can:
 1. Perform basic CRUD related to animes.
 2. Add animes to your lists.
 
-This project is used for learn more about the magic-huge web world and improve my Jedi Master Programming Skills in Python. Let's build the best Anime API;)
+This project is used for learn more about the magic-huge web world and improve my Jedi Master Programming Skills in Python. Let's build the best Anime API ;)
 
 ## Requirements
 - Python 3.5;
-- RabbitMQ 3.6.11;
+- RabbitMQ 3.6.11.
 
 ## Installation
 Install all libraries in the `requirements.pip` file:
@@ -28,7 +28,7 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 
-Change `settings.BROKER_URL` based in your RabbitMQ configurations.
+Change the `BROKER_URL` property in `project/settings.py` file based in your RabbitMQ configurations.
 Ensure that RabbitMQ is running.
 
 ## Running the project
