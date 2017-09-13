@@ -3,7 +3,6 @@ from django.contrib import admin
 
 urlpatterns = [
 	url(r'^v1/', include('animes.urls', namespace='animes')),
-	url(r'^v1/auth/', include('authentication.urls', namespace='authentications')),
 	url(r'^v1/', include('categories.urls', namespace='categories')),
 	url(r'^v1/', include('characters.urls', namespace='characters')),
 	url(r'^v1/', include('episodes.urls', namespace='episodes')),

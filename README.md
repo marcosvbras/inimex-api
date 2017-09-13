@@ -10,7 +10,7 @@ Using this API you can:
 1. Perform basic CRUD related to animes.
 2. Add animes to your lists.
 
-The Inimex API is used for learn more about the magic-huge web world and improve my Jedi Master Programming Skills in Python. This API will be the best API related to animes in the world, do you doubt it? 
+The Inimex API is used for learn more about the magic-huge web world and improve my Jedi Master Programming Skills in Python. This API will be the **Best API** related to animes in the world, **do you doubt it?** 
 
 <p align="center">
   <img src="https://raw.github.com/marcosvbras/inimex-api/master/readme_images/pikachu.jpg" alt="Custom image"/>
