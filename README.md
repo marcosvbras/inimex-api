@@ -62,6 +62,11 @@ celery --app=project flower
 - Broker: RabbitMQ
 - Database: SQLite
 
+## TO DO List
+- Custom User
+- User registration
+- Retrieve/Update AnimeList endpoint
+
 # License
 Copyright 2017 Marcos Vinícius Brás
 

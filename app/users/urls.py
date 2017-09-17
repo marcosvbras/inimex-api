@@ -1,8 +1,9 @@
 from django.conf.urls import url
-from .views import UserLoginView
+from .views import UserLoginView, UserSignupView
 
 from users import views
 
 urlpatterns = [
-	url(r'^authenticate/$', UserLoginView.as_view(), name='user_authentication'),
+	url(r'^authentication/login/$', UserLoginView.as_view(), name='user_login'),
+	url(r'^authentication/signup/$', UserSignupView.as_view(), name='user_signup'),
 ]
