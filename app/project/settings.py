@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'characters',
     'episodes',
     'genres',
+    'lists',
     'reviews',
     'searches'
 ]
